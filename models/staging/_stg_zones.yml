@@ -1,0 +1,15 @@
+version: 2
+
+models:
+  - name: stg_zones
+    description: "TODO: state the grain and what source this reads from"
+    columns:
+      - name: location_id
+        description: "TODO"
+        data_tests:
+          - not_null
+          - unique
+      - name: borough
+        description: "TODO"
+        data_tests:
+          - not_null

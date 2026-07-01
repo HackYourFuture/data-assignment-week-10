@@ -1,0 +1,34 @@
+version: 2
+
+models:
+  - name: fct_daily_borough_stats
+    description: >
+      TODO: state the grain (one row per ___), the source lineage
+      (built from ___ and ___), and at least one known caveat
+      (e.g. rows dropped in staging, any WARN-severity tests).
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - pickup_borough
+            - pickup_date
+    columns:
+      - name: pickup_borough
+        description: "TODO: explain what this column contains and where it comes from"
+        data_tests:
+          - not_null
+      - name: pickup_date
+        description: "TODO: explain units and how it is derived"
+        data_tests:
+          - not_null
+      - name: trip_count
+        description: "TODO: explain what is counted (unit: number of trips)"
+        data_tests:
+          - not_null
+      - name: total_fare
+        description: "TODO: explain units (USD) and what fare_amount represents"
+        data_tests:
+          - not_null
+      - name: avg_tip_pct
+        description: "TODO: explain the ratio (tip_amount / fare_amount), note that values > 1 are possible for the Unknown borough"
+      - name: avg_trip_distance
+        description: "TODO: explain units (miles, from TLC source data)"
