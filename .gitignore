@@ -1,3 +1,9 @@
+# dbt
+target/
+dbt_packages/
+logs/
+profiles.yml
+
 # System files
 .DS_Store
 Thumbs.db
