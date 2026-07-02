@@ -14,7 +14,10 @@ zones AS (
 )
 
 SELECT
-    -- TODO: join trips to zones on pickup_location_id = location_id
+    -- TODO: join trips to zones on pickup_location_id = location_id.
+    --   Use an INNER JOIN: a few trips have a pickup_location_id with no matching
+    --   zone (e.g. 999). INNER JOIN drops those so pickup_borough is never NULL and
+    --   can serve as part of the mart's primary key (your not_null test needs this).
     -- TODO: aggregate to grain (pickup_borough, pickup_date)
     -- Required output columns:
     --   pickup_borough   TEXT     - z.borough
