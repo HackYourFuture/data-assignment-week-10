@@ -6,13 +6,13 @@ HackYourFuture Data Track, Week 10. The full brief (business question, tasks, an
 
 A dbt Core project called `nyc_taxi_borough_daily` that produces a mart at the grain **one row per (pickup_borough, pickup_date)** for the NYC Green Taxi January 2024 dataset already loaded in the shared Azure PostgreSQL instance.
 
-## What this repo gives you (and what it does not)
+## What this repo gives you
 
-This repo contains the **support files** around the dbt project: templates, TODO stubs, and the autograder. It deliberately does **not** contain `dbt_project.yml`: creating the project is Task 1, and you do it yourself with `dbt init`.
+This repo is a **ready-to-run dbt project**: the project config is wired up and every model, test, and report is a TODO stub for you to fill in. You do not scaffold anything: your job is to write the models, tests, and docs.
 
 ```text
-.                                <- this repo becomes the dbt project root
-├── dbt_project.yml              <- NOT included: you create this in Task 1
+.                                <- this repo is the dbt project root
+├── dbt_project.yml              <- ready to run: staging = view, marts = table
 ├── packages.yml                 <- TODO stub: declare dbt_utils (Task 5)
 ├── profiles.yml.example         <- connection template: copy to profiles.yml
 ├── macros/
@@ -35,20 +35,9 @@ This repo contains the **support files** around the dbt project: templates, TODO
 └── AI_ASSIST.md                 <- template: document one LLM session (Task 8)
 ```
 
-## Task 1: create the dbt project into this repo
+## Task 1: connect to the shared database
 
-`dbt init` always generates a new subfolder, so create the project next to this repo and move its `dbt_project.yml` in:
-
-```bash
-# from inside this repo
-dbt init nyc_taxi_borough_daily --skip-profile-setup
-mv nyc_taxi_borough_daily/dbt_project.yml .
-rm -rf nyc_taxi_borough_daily/
-```
-
-Deleting the generated folder also removes the `models/example/` scaffolding the assignment warns about. Then open `dbt_project.yml` and remove the `example:` block under `models:`.
-
-## Connect to the shared database
+The project is already initialised, so Task 1 is just pointing it at the database with your personal schema.
 
 1. Copy the connection template and set your personal schema:
 

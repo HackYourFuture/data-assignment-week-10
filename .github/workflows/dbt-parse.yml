@@ -1,7 +1,7 @@
 name: dbt parse
 
 # Validates project structure and Jinja without a database connection.
-# Runs only once dbt_project.yml exists (i.e. after Task 1 is done).
+# dbt_project.yml ships with the template, so this always runs.
 # The static autograder (.hyf/test.sh) runs separately via grade-assignment.yml.
 
 on:
@@ -21,7 +21,7 @@ jobs:
             echo "present=true" >> "$GITHUB_OUTPUT"
           else
             echo "present=false" >> "$GITHUB_OUTPUT"
-            echo "::warning::dbt_project.yml not found -- complete Task 1 (dbt init) first. Skipping parse."
+            echo "::warning::dbt_project.yml not found -- it ships with the template; did you delete it? Skipping parse."
           fi
       - uses: actions/setup-python@v5
         if: steps.check.outputs.present == 'true'
