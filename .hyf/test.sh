@@ -18,12 +18,29 @@ INIT
 score=0
 PASSING=60
 
-# Helper: file exists, is non-empty, and has no unfilled TODO stubs
+# Helper: true when a file has real content and no *unreplaced* TODO stub.
+# The scaffold ships "-- TODO:" guide comments inside the starter models; a
+# student who writes the model below the comment and leaves the comment in
+# place is done, not stubbed. SQL line-comments are stripped before the check,
+# and only a line whose content *begins* with TODO (an unreplaced markdown/YAML
+# placeholder like "TODO: your answer") marks a file a stub.
 file_is_filled() {
   local f="$1"
   [[ -s "$f" ]] || return 1
-  grep -qiE "\bTODO\b" "$f" && return 1
+  local body
+  body="$(sed -E 's/--.*$//' "$f" | grep -vE '^[[:space:]]*$')"
+  [[ -n "$body" ]] || return 1
+  if printf '%s\n' "$body" | grep -qiE '^[[:space:]]*([#>*-]+[[:space:]]*)?TODO\b'; then
+    return 1
+  fi
   return 0
+}
+
+# Like `grep -qiE PATTERN FILE`, but on SQL with line-comments stripped, so a
+# keyword that appears only inside a "-- TODO: add a JOIN" guide comment does
+# NOT count as real SQL. Use this for every content check on a .sql deliverable.
+sqlgrep() {
+  sed -E 's/--.*$//' "$2" | grep -qiE "$1"
 }
 
 # ── Level 1 (10 pts): required files exist ──────────────────────────────────
@@ -97,31 +114,31 @@ l3=0
 st="$REPO_ROOT/models/staging/stg_trips.sql"
 sz="$REPO_ROOT/models/staging/stg_zones.sql"
 
-if file_is_filled "$st" && grep -qE "\{\{[[:space:]]*source\(" "$st"; then
+if file_is_filled "$st" && sqlgrep "\{\{[[:space:]]*source\(" "$st"; then
   ((l3 += 4)); pass "stg_trips.sql: uses {{ source() }} reference"
 else
   fail "stg_trips.sql: must use {{ source('nyc_taxi', 'raw_trips') }}"
 fi
 
-if file_is_filled "$st" && grep -qiE "pickup_location_id" "$st" && grep -qiE "IS NOT NULL|NOT NULL" "$st"; then
+if file_is_filled "$st" && sqlgrep "pickup_location_id" "$st" && sqlgrep "IS NOT NULL|NOT NULL" "$st"; then
   ((l3 += 4)); pass "stg_trips.sql: filters NULL pickup_location_id"
 else
   fail "stg_trips.sql: must filter WHERE pickup_location_id IS NOT NULL"
 fi
 
-if file_is_filled "$st" && grep -qiE "fare_amount" "$st" && grep -qiE ">=.*0|> -1" "$st"; then
+if file_is_filled "$st" && sqlgrep "fare_amount" "$st" && sqlgrep ">=.*0|> -1" "$st"; then
   ((l3 += 4)); pass "stg_trips.sql: filters negative fares (fare_amount >= 0)"
 else
   fail "stg_trips.sql: must filter WHERE fare_amount >= 0"
 fi
 
-if file_is_filled "$st" && grep -qiE "tip_pct|safe_divide" "$st"; then
+if file_is_filled "$st" && sqlgrep "tip_pct|safe_divide" "$st"; then
   ((l3 += 4)); pass "stg_trips.sql: tip_pct column present"
 else
   fail "stg_trips.sql: tip_pct column missing -- add {{ safe_divide('tip_amount', 'fare_amount') }} AS tip_pct"
 fi
 
-if file_is_filled "$sz" && grep -qE "\{\{[[:space:]]*source\(" "$sz"; then
+if file_is_filled "$sz" && sqlgrep "\{\{[[:space:]]*source\(" "$sz"; then
   ((l3 += 4)); pass "stg_zones.sql: uses {{ source() }} and is filled"
 else
   fail "stg_zones.sql: must use {{ source('nyc_taxi', 'raw_zones') }}"
@@ -136,19 +153,19 @@ mart="$REPO_ROOT/models/marts/fct_daily_borough_stats.sql"
 if file_is_filled "$mart"; then
   ((l4 += 2)); pass "fct_daily_borough_stats.sql: file filled"
 
-  if grep -qE "\{\{[[:space:]]*ref\('stg_trips'\)" "$mart" && grep -qE "\{\{[[:space:]]*ref\('stg_zones'\)" "$mart"; then
+  if sqlgrep "\{\{[[:space:]]*ref\('stg_trips'\)" "$mart" && sqlgrep "\{\{[[:space:]]*ref\('stg_zones'\)" "$mart"; then
     ((l4 += 4)); pass "mart: ref() to both stg_trips and stg_zones"
   else
     fail "mart: must reference both {{ ref('stg_trips') }} and {{ ref('stg_zones') }}"
   fi
 
-  if grep -qiE "(INNER|LEFT)?[[:space:]]*JOIN" "$mart"; then
+  if sqlgrep "(INNER|LEFT)?[[:space:]]*JOIN" "$mart"; then
     ((l4 += 4)); pass "mart: JOIN to zones present"
   else
     fail "mart: no JOIN -- must join stg_trips to stg_zones on pickup_location_id = location_id"
   fi
 
-  if grep -qiE "GROUP[[:space:]]+BY" "$mart"; then
+  if sqlgrep "GROUP[[:space:]]+BY" "$mart"; then
     ((l4 += 4)); pass "mart: GROUP BY present"
   else
     fail "mart: no GROUP BY -- must aggregate to (pickup_borough, pickup_date) grain"
@@ -156,7 +173,7 @@ if file_is_filled "$mart"; then
 
   cols_ok=0
   for col in pickup_borough pickup_date trip_count total_fare avg_tip_pct avg_trip_distance; do
-    if grep -qiE "$col" "$mart"; then
+    if sqlgrep "$col" "$mart"; then
       ((cols_ok += 1))
     else
       fail "mart: required output column '$col' not found"
@@ -192,7 +209,7 @@ else
 fi
 
 if [[ -n "$singular_test" ]] && file_is_filled "$singular_test"; then
-  if grep -qE "\{\{[[:space:]]*ref\('fct_daily_borough_stats'\)" "$singular_test"; then
+  if sqlgrep "\{\{[[:space:]]*ref\('fct_daily_borough_stats'\)" "$singular_test"; then
     ((l5 += 5)); pass "singular test: filled and references fct_daily_borough_stats"
   else
     ((l5 += 3)); pass "singular test: filled (does not reference fct_daily_borough_stats -- check)"
