@@ -39,6 +39,6 @@ jobs:
           PG_DBNAME: postgres
         run: |
           cp profiles.yml.example profiles.yml
-          sed -i 's/dev_<your_name>_borough/dev_ci_borough/' profiles.yml
+          sed -i 's/dev_<your_name>/dev_ci/' profiles.yml
           dbt deps
           dbt parse

@@ -1,6 +1,6 @@
 # Business Question Answers
 
-Queries run against `dev_<your_name>_borough.fct_daily_borough_stats`.
+Queries run against `dev_<your_name>.fct_daily_borough_stats`.
 
 ## Q1: Highest total `total_fare` across all of January 2024
 

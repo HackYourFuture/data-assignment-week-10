@@ -43,7 +43,7 @@ The project is already initialised, so Task 1 is just pointing it at the databas
 
 ```bash
 cp profiles.yml.example profiles.yml
-# edit profiles.yml: replace <your_name> so schema reads dev_<your_name>_borough
+# edit profiles.yml: replace <your_name> so schema reads dev_<your_name>
 ```
 
 2. Export the connection env vars (values are in the class vault; ask your mentor if you are missing them):
