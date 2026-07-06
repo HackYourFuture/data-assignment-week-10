@@ -8,7 +8,7 @@ nyc_taxi_borough_daily:
       user: "{{ env_var('PG_USER') }}"
       password: "{{ env_var('PG_PASSWORD') }}"
       dbname: "{{ env_var('PG_DBNAME', 'postgres') }}"
-      schema: "dev_<your_name>_borough"   # TODO: replace <your_name> with your first name
+      schema: "dev_<your_name>"   # TODO: replace <your_name> with your first name (the schema you already own)
       threads: 1
 
 # Copy this file to profiles.yml (same directory), fill in your name, and ensure
