@@ -2,7 +2,7 @@
 
 Queries run against `dev_<your_name>.fct_daily_borough_stats`.
 
-## Q1: Highest total `total_fare` across all of January 2024
+## Q1: Highest total `total_fare` across the whole loaded dataset
 
 **SQL:**
 
